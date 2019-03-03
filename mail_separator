@@ -1,0 +1,20 @@
+import re
+
+def group_by_start( src ):
+    buffer= []
+    for line in src:
+        if line.startswith( "From " ):
+            if buffer: yield buffer
+            buffer= [ line ]
+        else:
+            buffer.append( line )
+    yield buffer
+
+with open( "unix.mailbox", "r" ) as source:
+    for start_and_text in group_by_start( source ):
+        start_msg= start_and_text[0]
+        text_msg= start_and_text[1:]
+        match = re.findall(r'[\w\.-]+@[\w\.-]+ *?', start_msg)
+        with open("".join(match)+'.mailbox' , "a") as text_file:
+            text_file.write("".join(start_msg))
+            text_file.write("".join(text_msg))
